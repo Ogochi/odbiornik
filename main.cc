@@ -3,10 +3,11 @@
 
 #include <iostream>
 #include <string>
+#include <thread>
 
 namespace po = boost::program_options;
 using std::string;
-using std::cout;
+using std::cerr;
 
 int main(int argc, char **argv) {
     po::options_description desc("Options");
@@ -24,7 +25,8 @@ int main(int argc, char **argv) {
         po::store(po::parse_command_line(argc, argv, desc), vm);
         po::notify(vm);
     } catch(std::exception& e) {
-        cout << "oj!\n";
+        std::cerr << "Wrong program options!" << std::endl;
+        return 1;
     }
 
     ReceiverBuilder* receiverBuilder = new ReceiverBuilder();
@@ -33,13 +35,13 @@ int main(int argc, char **argv) {
         receiverBuilder->setDISCOVER_ADDR(vm["-d"].as<string>());
     }
     if (vm.count("-P")) {
-        cout << receiverBuilder->setDATA_PORT(vm["-P"].as<int>());
+        receiverBuilder->setDATA_PORT(vm["-P"].as<int>());
     }
     if (vm.count("-C")) {
-        cout << receiverBuilder->setCTRL_PORT(vm["-C"].as<int>());
+        receiverBuilder->setCTRL_PORT(vm["-C"].as<int>());
     }
     if (vm.count("-U")) {
-        cout << receiverBuilder->setUI_PORT(vm["-U"].as<int>());
+        receiverBuilder->setUI_PORT(vm["-U"].as<int>());
     }
     if (vm.count("-B")) {
         receiverBuilder->setBSIZE(vm["-B"].as<int>());
