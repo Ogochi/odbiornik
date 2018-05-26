@@ -1,4 +1,59 @@
-//
-// Created by ogochi on 26.05.18.
-//
+#include "boost/program_options.hpp"
+#include "ReceiverBuilder.h"
 
+#include <iostream>
+#include <string>
+
+namespace po = boost::program_options;
+using std::string;
+using std::cout;
+
+int main(int argc, char **argv) {
+    po::options_description desc("Options");
+    desc.add_options()
+            (",d", po::value<string>(), "DISCOVER_ADDR ")
+            (",P", po::value<int>(), "DATA_PORT ")
+            (",C", po::value<int>(), "CTRL_PORT")
+            (",U", po::value<int>(), "UI_PORT")
+            (",B", po::value<int>(), "BSIZE")
+            (",R", po::value<int>(), "RTIME")
+            (",n", po::value<string>(), "Name of preffered station");
+
+    po::variables_map vm;
+    try {
+        po::store(po::parse_command_line(argc, argv, desc), vm);
+        po::notify(vm);
+    } catch(std::exception& e) {
+        cout << "oj!\n";
+    }
+
+    ReceiverBuilder* receiverBuilder = new ReceiverBuilder();
+
+    if (vm.count("-d")) {
+        receiverBuilder->setDISCOVER_ADDR(vm["-d"].as<string>());
+    }
+    if (vm.count("-P")) {
+        cout << receiverBuilder->setDATA_PORT(vm["-P"].as<int>());
+    }
+    if (vm.count("-C")) {
+        cout << receiverBuilder->setCTRL_PORT(vm["-C"].as<int>());
+    }
+    if (vm.count("-U")) {
+        cout << receiverBuilder->setUI_PORT(vm["-U"].as<int>());
+    }
+    if (vm.count("-B")) {
+        receiverBuilder->setBSIZE(vm["-B"].as<int>());
+    }
+    if (vm.count("-R")) {
+        receiverBuilder->setRTIME(vm["-R"].as<int>());
+    }
+
+    Receiver* receiver = receiverBuilder->build();
+    delete receiverBuilder;
+
+    receiver->run();
+
+    delete receiver;
+
+    return 0;
+}
