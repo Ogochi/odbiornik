@@ -24,12 +24,12 @@ int main(int argc, char **argv) {
     try {
         po::store(po::parse_command_line(argc, argv, desc), vm);
         po::notify(vm);
-    } catch(std::exception& e) {
+    } catch(std::exception &e) {
         std::cerr << "Wrong program options!" << std::endl;
         return 1;
     }
 
-    ReceiverBuilder* receiverBuilder = new ReceiverBuilder();
+    ReceiverBuilder *receiverBuilder = new ReceiverBuilder();
 
     if (vm.count("-d")) {
         receiverBuilder->setDISCOVER_ADDR(vm["-d"].as<string>());
