@@ -1,0 +1,39 @@
+#ifndef SIK3_STATIONSFETCHER_H
+#define SIK3_STATIONSFETCHER_H
+
+
+#include "Station.h"
+#include "Receiver.h"
+#include <queue>
+#include <netinet/in.h>
+#include <mutex>
+
+using std::queue;
+using std::mutex;
+
+class Receiver;
+
+class StationsFetcher {
+    friend class Receiver;
+private:
+    Receiver *receiver;
+
+    int sock;
+    struct sockaddr_in remoteAddress;
+
+    long long fetchId = 0;
+    mutex fetchNumberMutex;
+
+    StationsFetcher(Receiver *rec) : receiver(rec) {}
+    ~StationsFetcher();
+    void setUpSocket();
+    void sendLookUpPeriodically(int periodInSeconds);
+    void listenForReplies() const;
+    void run();
+
+public:
+    StationsFetcher() = delete;
+};
+
+
+#endif //SIK3_STATIONSFETCHER_H
