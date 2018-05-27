@@ -7,16 +7,22 @@
 #include "StationsFetcher.h"
 #include <string>
 #include <iostream>
-#include <queue>
+#include <list>
 #include <thread>
 #include <mutex>
 
 using std::string;
 using std::thread;
-using std::queue;
+using std::list;
 using std::mutex;
 
 class StationsFetcher;
+
+enum State {
+    STATION_NOT_SELECTED,
+    STATION_SELECTED,
+    STATION_CHANGED,
+};
 
 class Receiver {
     friend class ReceiverBuilder;
@@ -36,10 +42,16 @@ private:
                                          prefferedStation(_prefferedStation) {};
 
 
-    queue<Station*> *stations = new queue<Station*>();
-    mutex stationsMutex;
+    list<Station*> *stations = new list<Station*>();
+    mutex stationsMutex; // Guards 'stations'
+
+    Station *currentStation;
+    State state = STATION_NOT_SELECTED;
+    bool isPlaybackRunning = false;
+    mutex stateMutex; // Guards 'currentStation', 'state' and 'isPlaybackRunning'
 
     void addFetcher();
+    void startPlayback();
 public:
     Receiver() = delete;
     ~Receiver();

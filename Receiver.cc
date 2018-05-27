@@ -3,6 +3,7 @@
 
 void Receiver::addFetcher() {
     stationsFetcher = new StationsFetcher(this);
+    stationsFetcher->run();
 }
 
 void Receiver::run() {
@@ -14,12 +15,16 @@ void Receiver::run() {
     addFetcher();
 }
 
+void Receiver::startPlayback() {
+
+}
+
 Receiver::~Receiver() {
     delete stationsFetcher;
 
     while (!stations->empty()) {
         Station *s = stations->front();
-        stations->pop();
+        stations->pop_front();
         delete(s);
     }
 
