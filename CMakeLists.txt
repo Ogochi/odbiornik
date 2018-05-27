@@ -23,7 +23,7 @@ macro (add_executable _name)
     endif()
 endmacro()
 
-add_executable(sik3 main.cc Receiver.cc Receiver.h ReceiverBuilder.h ReceiverBuilder.cc Station.h StationsFetcher.cc StationsFetcher.h err.cc err.h)
+add_executable(sik3 main.cc Receiver.cc Receiver.h ReceiverBuilder.h ReceiverBuilder.cc Station.h StationsFetcher.cc StationsFetcher.h err.cc err.h DataFetcher.cc DataFetcher.h)
 
 target_link_libraries(sik3 ${Boost_LIBRARIES})
 

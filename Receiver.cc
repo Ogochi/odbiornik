@@ -1,7 +1,8 @@
 #include "Receiver.h"
 
 
-void Receiver::addFetcher() {
+void Receiver::setupFetchers() {
+    dataFetcher = new DataFetcher(this);
     stationsFetcher = new StationsFetcher(this);
     stationsFetcher->run();
 }
@@ -12,15 +13,16 @@ void Receiver::run() {
     if (isPrefferedStationSet)
         std::cout << " " << prefferedStation << "\n";
 
-    addFetcher();
+    setupFetchers();
 }
 
 void Receiver::startPlayback() {
-
+    dataFetcher->run();
 }
 
 Receiver::~Receiver() {
     delete stationsFetcher;
+    delete dataFetcher;
 
     while (!stations->empty()) {
         Station *s = stations->front();
