@@ -123,7 +123,8 @@ void StationsFetcher::listenForReplies() const {
                             receiver->state = STATION_CHANGED;
                         } else {
                             receiver->state = STATION_SELECTED;
-                            receiver->startPlayback();
+                            thread t = thread([this](){ receiver->startPlayback(); });
+                            t.detach();
                         }
                     }
                     receiver->stateMutex.unlock();
