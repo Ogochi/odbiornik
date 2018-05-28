@@ -22,7 +22,6 @@ private:
     struct sockaddr_in remoteAddress;
 
     long long fetchId = 0;
-    mutex fetchNumberMutex;
 
     StationsFetcher(Receiver *rec) : receiver(rec) {}
     ~StationsFetcher();

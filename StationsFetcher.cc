@@ -21,9 +21,9 @@ void StationsFetcher::setUpSocket() {
     if (setsockopt(sock, SOL_SOCKET, SO_BROADCAST, (void*)&optval, sizeof optval) < 0)
         syserr("setsockopt broadcast");
 
-//    optval = TTL_VALUE;
-//    if (setsockopt(sock, IPPROTO_IP, IP_MULTICAST_TTL, (void*)&optval, sizeof optval) < 0)
-//        syserr("setsockopt multicast ttl");
+    optval = 60;
+    if (setsockopt(sock, IPPROTO_IP, IP_MULTICAST_TTL, (void*)&optval, sizeof optval) < 0)
+        syserr("setsockopt multicast ttl");
 
     const char *remoteDottedAddr = receiver->DISCOVER_ADDR.c_str();
     remoteAddress.sin_family = AF_INET;
@@ -138,7 +138,7 @@ void StationsFetcher::run() {
 
     thread fetcherSend([this](){ sendLookUpPeriodically(5); });
     fetcherSend.detach();
-    thread fetcherListen([this](){ listenForReplies(); });
-    fetcherListen.detach();
+
+    listenForReplies();
 }
 
