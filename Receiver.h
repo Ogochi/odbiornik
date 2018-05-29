@@ -11,13 +11,11 @@
 #include <list>
 #include <thread>
 #include <mutex>
-#include <map>
 
 using std::string;
 using std::thread;
 using std::list;
 using std::mutex;
-using std::map;
 
 class StationsFetcher;
 class DataFetcher;
@@ -54,9 +52,6 @@ private:
     State state = STATION_NOT_SELECTED;
     bool isPlaybackRunning = false;
     mutex stateMutex; // Guards 'currentStation', 'state' and 'isPlaybackRunning'
-
-    map<uint64_t, Package> dataBuffer; // <firstByteNum, referring Package>
-    mutex dataMutex; // Guards 'dataBuffer'
 
     void setupFetchers();
     void startFetchingData();
