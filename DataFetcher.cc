@@ -73,12 +73,12 @@ void DataFetcher::run() {
                 dataBuffer.erase(dataBuffer.begin(), --mapIter);
             // Adding new package
             dataBuffer[p->firstByteNum] = *p;
-            dataMutex.unlock();
             // Starting playback if buffer is filled enough
-            if (!isValidPlayback) {
+            if (!isValidPlayback && p->firstByteNum >= BYTE0 + receiver->BSIZE*3/4) {
                 isValidPlayback = true;
                 thread([this]() { startPlayback(BYTE0, validPlaybackID); });
             }
+            dataMutex.unlock();
         }
     }
 
