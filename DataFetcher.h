@@ -12,10 +12,10 @@ private:
     Receiver *receiver;
 
     int sock;
-    struct sockaddr_in remoteAddress;
 
     DataFetcher(Receiver *rec) : receiver(rec) {}
 
+    void setupSocket(string multicastDottedAddress, int dataPort);
     void run();
 
 public:

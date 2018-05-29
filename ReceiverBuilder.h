@@ -12,7 +12,6 @@ class Receiver;
 class ReceiverBuilder {
 private:
     string DISCOVER_ADDR = "255.255.255.255";
-    int DATA_PORT = 20000 + (382783 % 10000);
     int CTRL_PORT = 30000 + (382783 % 10000);
     int UI_PORT = 10000 + (382783 % 10000);
     int BSIZE = 65536;
@@ -25,7 +24,6 @@ public:
     ReceiverBuilder() = default;
 
     ReceiverBuilder* setDISCOVER_ADDR(string addr) { DISCOVER_ADDR = addr; return this; }
-    ReceiverBuilder* setDATA_PORT(int port) { DATA_PORT = port; return this; }
     ReceiverBuilder* setCTRL_PORT(int port) { CTRL_PORT = port; return this; }
     ReceiverBuilder* setUI_PORT(int port) { UI_PORT = port; return this; }
     ReceiverBuilder* setBSIZE(int bytes) { BSIZE = bytes; return this; }

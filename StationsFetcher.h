@@ -2,7 +2,7 @@
 #define SIK3_STATIONSFETCHER_H
 
 
-#include "Station.h"
+#include "Structures.h"
 #include "Receiver.h"
 #include <queue>
 #include <netinet/in.h>

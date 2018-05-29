@@ -13,7 +13,6 @@ int main(int argc, char **argv) {
     po::options_description desc("Options");
     desc.add_options()
             (",d", po::value<string>(), "DISCOVER_ADDR ")
-            (",P", po::value<int>(), "DATA_PORT ")
             (",C", po::value<int>(), "CTRL_PORT")
             (",U", po::value<int>(), "UI_PORT")
             (",B", po::value<int>(), "BSIZE")
@@ -34,9 +33,6 @@ int main(int argc, char **argv) {
     if (vm.count("-d")) {
         receiverBuilder->setDISCOVER_ADDR(vm["-d"].as<string>());
     }
-    if (vm.count("-P")) {
-        receiverBuilder->setDATA_PORT(vm["-P"].as<int>());
-    }
     if (vm.count("-C")) {
         receiverBuilder->setCTRL_PORT(vm["-C"].as<int>());
     }
@@ -48,6 +44,9 @@ int main(int argc, char **argv) {
     }
     if (vm.count("-R")) {
         receiverBuilder->setRTIME(vm["-R"].as<int>());
+    }
+    if (vm.count("-n")) {
+        receiverBuilder->setPrefferedStation(vm["-n"].as<string>());
     }
 
     Receiver* receiver = receiverBuilder->build();

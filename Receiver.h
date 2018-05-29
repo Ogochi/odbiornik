@@ -3,7 +3,7 @@
 
 
 #include "ReceiverBuilder.h"
-#include "Station.h"
+#include "Structures.h"
 #include "StationsFetcher.h"
 #include "DataFetcher.h"
 #include <string>
@@ -11,11 +11,13 @@
 #include <list>
 #include <thread>
 #include <mutex>
+#include <map>
 
 using std::string;
 using std::thread;
 using std::list;
 using std::mutex;
+using std::map;
 
 class StationsFetcher;
 class DataFetcher;
@@ -33,29 +35,31 @@ class Receiver {
 private:
     string DISCOVER_ADDR, prefferedStation;
     bool isPrefferedStationSet = false;
-    int DATA_PORT, CTRL_PORT, UI_PORT, BSIZE, RTIME;
+    int CTRL_PORT, UI_PORT, BSIZE, RTIME;
     StationsFetcher *stationsFetcher;
     DataFetcher *dataFetcher;
 
-    Receiver(string _DISCOVER_ADDR, int _DATA_PORT, int _CTRL_PORT, int _UI_PORT, int _BSIZE, int _RTIME) :
-            DISCOVER_ADDR(_DISCOVER_ADDR), DATA_PORT(_DATA_PORT), CTRL_PORT(_CTRL_PORT), UI_PORT(_UI_PORT), BSIZE(_BSIZE),
+    Receiver(string _DISCOVER_ADDR, int _CTRL_PORT, int _UI_PORT, int _BSIZE, int _RTIME) :
+            DISCOVER_ADDR(_DISCOVER_ADDR), CTRL_PORT(_CTRL_PORT), UI_PORT(_UI_PORT), BSIZE(_BSIZE),
             RTIME(_RTIME) {};
-    Receiver(string _DISCOVER_ADDR, int _DATA_PORT, int _CTRL_PORT, int _UI_PORT, int _BSIZE, int _RTIME,
-             string _prefferedStation) : DISCOVER_ADDR(_DISCOVER_ADDR), DATA_PORT(_DATA_PORT), CTRL_PORT(_CTRL_PORT),
-                                         UI_PORT(_UI_PORT), BSIZE(_BSIZE), RTIME(_RTIME), isPrefferedStationSet(true),
-                                         prefferedStation(_prefferedStation) {};
+    Receiver(string _DISCOVER_ADDR, int _CTRL_PORT, int _UI_PORT, int _BSIZE, int _RTIME, string _prefferedStation) :
+            DISCOVER_ADDR(_DISCOVER_ADDR), CTRL_PORT(_CTRL_PORT), UI_PORT(_UI_PORT), BSIZE(_BSIZE), RTIME(_RTIME),
+            isPrefferedStationSet(true), prefferedStation(_prefferedStation) {};
 
 
-    list<Station*> *stations = new list<Station*>();
+    list<Stations*> *stations = new list<Stations*>();
     mutex stationsMutex; // Guards 'stations'
 
-    Station *currentStation;
+    Stations *currentStation;
     State state = STATION_NOT_SELECTED;
     bool isPlaybackRunning = false;
     mutex stateMutex; // Guards 'currentStation', 'state' and 'isPlaybackRunning'
 
+    map<uint64_t, Package> dataBuffer; // <firstByteNum, referring Package>
+    mutex dataMutex; // Guards 'dataBuffer'
+
     void setupFetchers();
-    void startPlayback();
+    void startFetchingData();
 public:
     Receiver() = delete;
     ~Receiver();

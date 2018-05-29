@@ -101,7 +101,7 @@ void StationsFetcher::listenForReplies() const {
             while(stm >> s)
                 name += s;
 
-            Station *newStation = new Station(addr, transmitterAddr, port, name, fetchId);
+            Stations *newStation = new Stations(addr, transmitterAddr, port, name, fetchId);
             receiver->stationsMutex.lock();
             // Removing the same station with old timestamp
             for (auto i = receiver->stations->begin(); i != receiver->stations->end(); i++) {
@@ -123,7 +123,7 @@ void StationsFetcher::listenForReplies() const {
                             receiver->state = STATION_CHANGED;
                         } else {
                             receiver->state = STATION_SELECTED;
-                            thread t = thread([this](){ receiver->startPlayback(); });
+                            thread t = thread([this](){ receiver->startFetchingData(); });
                             t.detach();
                         }
                     }

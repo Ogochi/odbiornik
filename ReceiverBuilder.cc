@@ -2,9 +2,9 @@
 
 Receiver* ReceiverBuilder::build() const {
     if (isPrefferedStationSet)
-        return new Receiver(DISCOVER_ADDR, DATA_PORT, CTRL_PORT, UI_PORT, BSIZE, RTIME, prefferedStation);
+        return new Receiver(DISCOVER_ADDR, CTRL_PORT, UI_PORT, BSIZE, RTIME, prefferedStation);
     else
-        return new Receiver(DISCOVER_ADDR, DATA_PORT, CTRL_PORT, UI_PORT, BSIZE, RTIME);
+        return new Receiver(DISCOVER_ADDR, CTRL_PORT, UI_PORT, BSIZE, RTIME);
 }
 
 ReceiverBuilder* ReceiverBuilder::setPrefferedStation(string station) {
