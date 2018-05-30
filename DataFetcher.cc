@@ -13,7 +13,6 @@ void DataFetcher::reset() {
 
     dataMutex.lock();
     dataBuffer.clear();
-    bufferUsedSpace = 0;
     receivedFirstPackage = false;
     dataMutex.unlock();
 }
@@ -62,21 +61,29 @@ void DataFetcher::run() {
                 BYTE0 = p->firstByteNum;
                 sessionId = p->sessionId;
             }
-            // Removing too old packages
-            auto mapIter = dataBuffer.begin();
-            bool shouldErase = false;
-            while (mapIter->first < p->firstByteNum + strlen(p->audioData) - receiver->BSIZE) {
-                mapIter++;
-                shouldErase = true;
-            }
-            if (shouldErase)
-                dataBuffer.erase(dataBuffer.begin(), --mapIter);
-            // Adding new package
-            dataBuffer[p->firstByteNum] = *p;
-            // Starting playback if buffer is filled enough
-            if (!isValidPlayback && p->firstByteNum >= BYTE0 + receiver->BSIZE*3/4) {
-                isValidPlayback = true;
-                thread([this]() { startPlayback(BYTE0, validPlaybackID); });
+
+            if (sessionId == p->sessionId) {
+                // Removing too old packages
+                auto mapIter = dataBuffer.begin();
+                bool shouldErase = false;
+                while (mapIter->first < p->firstByteNum + strlen(p->audioData) - receiver->BSIZE) {
+                    mapIter++;
+                    shouldErase = true;
+                }
+                if (shouldErase)
+                    dataBuffer.erase(dataBuffer.begin(), --mapIter);
+                // Adding new package
+                dataBuffer[p->firstByteNum] = *p;
+                // Starting playback if buffer is filled enough
+                if (!isValidPlayback && p->firstByteNum >= BYTE0 + receiver->BSIZE * 3 / 4) {
+                    isValidPlayback = true;
+                    thread([this]() { startPlayback(BYTE0, validPlaybackID); });
+                }
+            } else if (sessionId < p->sessionId) {
+                isValidPlayback = false;
+                validPlaybackID++;
+                close(sock);
+                reset();
             }
             dataMutex.unlock();
         }

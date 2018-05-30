@@ -19,7 +19,6 @@ private:
     int sock = -1;
 
     map<uint64_t, Package> dataBuffer; // <firstByteNum, referring Package>
-    uint64_t bufferUsedSpace = 0;
     uint64_t BYTE0 = 0;
     uint64_t sessionId = 0;
     bool receivedFirstPackage = false;
