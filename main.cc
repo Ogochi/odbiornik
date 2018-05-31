@@ -12,7 +12,7 @@ using std::cerr;
 int main(int argc, char **argv) {
     po::options_description desc("Options");
     desc.add_options()
-            (",d", po::value<string>(), "DISCOVER_ADDR ")
+            (",d", po::value<string>(), "DISCOVER_ADDR")
             (",C", po::value<int>(), "CTRL_PORT")
             (",U", po::value<int>(), "UI_PORT")
             (",B", po::value<int>(), "BSIZE")

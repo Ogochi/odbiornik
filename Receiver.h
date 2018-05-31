@@ -6,6 +6,7 @@
 #include "Structures.h"
 #include "StationsFetcher.h"
 #include "DataFetcher.h"
+#include "RetransmissionRequestSender.h"
 #include <string>
 #include <iostream>
 #include <list>
@@ -17,8 +18,10 @@ using std::thread;
 using std::list;
 using std::mutex;
 
+class ReceiverBuilder;
 class StationsFetcher;
 class DataFetcher;
+class RetransmissionRequestSender;
 
 enum State {
     STATION_NOT_SELECTED,
@@ -30,12 +33,14 @@ class Receiver {
     friend class ReceiverBuilder;
     friend class StationsFetcher;
     friend class DataFetcher;
+    friend RetransmissionRequestSender;
 private:
     string DISCOVER_ADDR, prefferedStation;
     bool isPrefferedStationSet = false;
     int CTRL_PORT, UI_PORT, BSIZE, RTIME;
     StationsFetcher *stationsFetcher;
     DataFetcher *dataFetcher;
+    RetransmissionRequestSender *retransmissionRequestSender;
 
     Receiver(string _DISCOVER_ADDR, int _CTRL_PORT, int _UI_PORT, int _BSIZE, int _RTIME) :
             DISCOVER_ADDR(_DISCOVER_ADDR), CTRL_PORT(_CTRL_PORT), UI_PORT(_UI_PORT), BSIZE(_BSIZE),

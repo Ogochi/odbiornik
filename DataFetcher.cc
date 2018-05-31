@@ -80,6 +80,7 @@ void DataFetcher::run() {
                     thread([this]() { startPlayback(BYTE0, validPlaybackID); });
                 }
             } else if (sessionId < p->sessionId) {
+                // Reset
                 isValidPlayback = false;
                 validPlaybackID++;
                 close(sock);

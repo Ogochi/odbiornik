@@ -4,6 +4,7 @@
 void Receiver::setupFetchers() {
     dataFetcher = new DataFetcher(this);
     stationsFetcher = new StationsFetcher(this);
+    retransmissionRequestSender = new RetransmissionRequestSender(this);
     stationsFetcher->run();
 }
 
