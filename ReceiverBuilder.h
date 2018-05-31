@@ -7,13 +7,15 @@
 
 using std::string;
 
+#define ALBUM 382783
+
 class Receiver;
 
 class ReceiverBuilder {
 private:
     string DISCOVER_ADDR = "255.255.255.255";
-    int CTRL_PORT = 30000 + (382783 % 10000);
-    int UI_PORT = 10000 + (382783 % 10000);
+    int CTRL_PORT = 30000 + (ALBUM % 10000);
+    int UI_PORT = 10000 + (ALBUM % 10000);
     int BSIZE = 65536;
     int RTIME = 250;
 
