@@ -18,6 +18,7 @@ void DataFetcher::reset() {
 }
 
 void DataFetcher::run() {
+    std::cerr << "Started fetching data\n";
     receiver->stateMutex.lock();
     reset();
     receiver->stateMutex.unlock();

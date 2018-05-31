@@ -107,10 +107,12 @@ void StationsFetcher::listenForReplies() const {
                 name += s;
 
             Stations *newStation = new Stations(addr, transmitterAddr, port, name, fetchId);
+            std::cerr << "Created Station object\n";
             receiver->stationsMutex.lock();
             // Removing the same station with old timestamp
             for (auto i = receiver->stations->begin(); i != receiver->stations->end(); i++) {
                 if ((*i)->equals(newStation)) {
+                    std::cerr << "Found old timestamp for that station\n";
                     receiver->stations->erase(i);
                     break;
                 }
