@@ -24,10 +24,11 @@ public:
     }
 };
 
-struct Package {
+struct __attribute__((__packed__)) Package {
     uint64_t sessionId;
     uint64_t firstByteNum;
-    char *audioData;
+    // char *audioData;
+    string audioData;
 };
 
 #endif //SIK3_STRUCTURES_H

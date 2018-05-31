@@ -52,14 +52,17 @@ void DataFetcher::run() {
             break;
 
         std::cerr << "Reading to buffer \n";
-        rcv_len = read(sock, buffer, sizeof buffer);
+        Package pack;
+        rcv_len = read(sock, (char*)&pack, sizeof(pack));
+        Package *p = &pack; 
+        // std::cerr << "Received: " << buffer << "\n";
         if (rcv_len < 0) {
             std::cerr << "Data Fetcher read nothing" << std::endl;
             continue;
         } else {
             std::cerr << "Received Package, trying to cast " << buffer << "\n";
-            auto p = reinterpret_cast<Package*>(buffer);
-            std:;cerr << "Made cast\n";
+            // auto p = reinterpret_cast<Package*>(buffer);
+            std::cerr << "Made cast: " << p->sessionId << " " << p->firstByteNum << " " <<  p->audioData << "\n";
             dataMutex.lock();
             // Case when received first package
             if (!receivedFirstPackage) {
@@ -71,14 +74,26 @@ void DataFetcher::run() {
 
             if (sessionId == p->sessionId) {
                 // Removing too old packages
-                auto mapIter = dataBuffer.begin();
-                bool shouldErase = false;
-                while (mapIter->first < p->firstByteNum + strlen(p->audioData) - receiver->BSIZE) {
-                    mapIter++;
-                    shouldErase = true;
+                if (!dataBuffer.empty()) {
+                    auto mapIter = dataBuffer.begin();
+                    bool shouldErase = false;
+                    std::cerr << "prewhile\n";
+                    while (true) {
+                        std::cerr << "mapIter->first " << mapIter->first << "\n";
+                        std::cerr << "iter\n";
+                        if (mapIter != dataBuffer.end() )
+                            std::cerr << "not end\n";
+                        if (mapIter != dataBuffer.end() &&
+                        mapIter->first < p->firstByteNum + strlen(p->audioData) - receiver->BSIZE) {
+                            mapIter++;
+                            shouldErase = true;
+                        } else 
+                            break;
+                    }
+                    std::cerr << "if should erase\n";
+                    if (shouldErase)
+                        dataBuffer.erase(dataBuffer.begin(), --mapIter);
                 }
-                if (shouldErase)
-                    dataBuffer.erase(dataBuffer.begin(), --mapIter);
                 // Adding new package
                 dataBuffer[p->firstByteNum] = *p;
                 // Starting playback if buffer is filled enough
@@ -88,7 +103,7 @@ void DataFetcher::run() {
                     thread([this]() { startPlayback(BYTE0, validPlaybackID); });
                 }
             } else if (sessionId < p->sessionId) {
-                strd::cerr << "Different sessionId\n";
+                std::cerr << "Different sessionId\n";
                 // Reset
                 isValidPlayback = false;
                 validPlaybackID++;

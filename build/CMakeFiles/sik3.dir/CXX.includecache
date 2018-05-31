@@ -1,0 +1,152 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/szymon/Desktop/Studia 17 18/SIK/MICHAŁ/sik2/DataFetcher.cc
+DataFetcher.h
+/home/szymon/Desktop/Studia 17 18/SIK/MICHAŁ/sik2/DataFetcher.h
+err.h
+/home/szymon/Desktop/Studia 17 18/SIK/MICHAŁ/sik2/err.h
+iostream
+-
+thread
+-
+
+/home/szymon/Desktop/Studia 17 18/SIK/MICHAŁ/sik2/DataFetcher.h
+Receiver.h
+/home/szymon/Desktop/Studia 17 18/SIK/MICHAŁ/sik2/Receiver.h
+map
+-
+mutex
+-
+
+/home/szymon/Desktop/Studia 17 18/SIK/MICHAŁ/sik2/Receiver.cc
+Receiver.h
+/home/szymon/Desktop/Studia 17 18/SIK/MICHAŁ/sik2/Receiver.h
+
+/home/szymon/Desktop/Studia 17 18/SIK/MICHAŁ/sik2/Receiver.h
+ReceiverBuilder.h
+/home/szymon/Desktop/Studia 17 18/SIK/MICHAŁ/sik2/ReceiverBuilder.h
+Structures.h
+/home/szymon/Desktop/Studia 17 18/SIK/MICHAŁ/sik2/Structures.h
+StationsFetcher.h
+/home/szymon/Desktop/Studia 17 18/SIK/MICHAŁ/sik2/StationsFetcher.h
+DataFetcher.h
+/home/szymon/Desktop/Studia 17 18/SIK/MICHAŁ/sik2/DataFetcher.h
+RetransmissionRequestSender.h
+/home/szymon/Desktop/Studia 17 18/SIK/MICHAŁ/sik2/RetransmissionRequestSender.h
+string
+-
+iostream
+-
+list
+-
+thread
+-
+mutex
+-
+
+/home/szymon/Desktop/Studia 17 18/SIK/MICHAŁ/sik2/ReceiverBuilder.cc
+ReceiverBuilder.h
+/home/szymon/Desktop/Studia 17 18/SIK/MICHAŁ/sik2/ReceiverBuilder.h
+
+/home/szymon/Desktop/Studia 17 18/SIK/MICHAŁ/sik2/ReceiverBuilder.h
+Receiver.h
+/home/szymon/Desktop/Studia 17 18/SIK/MICHAŁ/sik2/Receiver.h
+string
+-
+
+/home/szymon/Desktop/Studia 17 18/SIK/MICHAŁ/sik2/RetransmissionRequestSender.cc
+RetransmissionRequestSender.h
+/home/szymon/Desktop/Studia 17 18/SIK/MICHAŁ/sik2/RetransmissionRequestSender.h
+Receiver.h
+/home/szymon/Desktop/Studia 17 18/SIK/MICHAŁ/sik2/Receiver.h
+thread
+-
+
+/home/szymon/Desktop/Studia 17 18/SIK/MICHAŁ/sik2/RetransmissionRequestSender.h
+zconf.h
+-
+deque
+-
+string
+-
+ctime
+-
+mutex
+-
+chrono
+-
+algorithm
+-
+
+/home/szymon/Desktop/Studia 17 18/SIK/MICHAŁ/sik2/StationsFetcher.cc
+arpa/inet.h
+-
+iostream
+-
+thread
+-
+sstream
+-
+StationsFetcher.h
+/home/szymon/Desktop/Studia 17 18/SIK/MICHAŁ/sik2/StationsFetcher.h
+err.h
+/home/szymon/Desktop/Studia 17 18/SIK/MICHAŁ/sik2/err.h
+
+/home/szymon/Desktop/Studia 17 18/SIK/MICHAŁ/sik2/StationsFetcher.h
+Structures.h
+/home/szymon/Desktop/Studia 17 18/SIK/MICHAŁ/sik2/Structures.h
+Receiver.h
+/home/szymon/Desktop/Studia 17 18/SIK/MICHAŁ/sik2/Receiver.h
+queue
+-
+netinet/in.h
+-
+mutex
+-
+
+/home/szymon/Desktop/Studia 17 18/SIK/MICHAŁ/sik2/Structures.h
+string
+-
+arpa/inet.h
+-
+
+/home/szymon/Desktop/Studia 17 18/SIK/MICHAŁ/sik2/err.cc
+err.h
+/home/szymon/Desktop/Studia 17 18/SIK/MICHAŁ/sik2/err.h
+
+/home/szymon/Desktop/Studia 17 18/SIK/MICHAŁ/sik2/err.h
+stdio.h
+-
+stdlib.h
+-
+unistd.h
+-
+stdarg.h
+-
+errno.h
+-
+sys/types.h
+-
+sys/wait.h
+-
+string.h
+-
+
+/home/szymon/Desktop/Studia 17 18/SIK/MICHAŁ/sik2/main.cc
+boost/program_options.hpp
+/home/szymon/Desktop/Studia 17 18/SIK/MICHAŁ/sik2/boost/program_options.hpp
+ReceiverBuilder.h
+/home/szymon/Desktop/Studia 17 18/SIK/MICHAŁ/sik2/ReceiverBuilder.h
+iostream
+-
+string
+-
+thread
+-
+

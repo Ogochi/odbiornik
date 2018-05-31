@@ -1,0 +1,51 @@
+Determining if the pthread_create exist failed with the following output:
+Change Dir: /home/szymon/Desktop/Studia 17 18/SIK/MICHAŁ/sik2/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/gmake" "cmTC_0af88/fast"
+/usr/bin/gmake -f CMakeFiles/cmTC_0af88.dir/build.make CMakeFiles/cmTC_0af88.dir/build
+gmake[1]: Entering directory '/home/szymon/Desktop/Studia 17 18/SIK/MICHAŁ/sik2/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_0af88.dir/CheckSymbolExists.c.o
+/usr/lib64/ccache/cc    -o CMakeFiles/cmTC_0af88.dir/CheckSymbolExists.c.o   -c "/home/szymon/Desktop/Studia 17 18/SIK/MICHAŁ/sik2/build/CMakeFiles/CMakeTmp/CheckSymbolExists.c"
+Linking C executable cmTC_0af88
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_0af88.dir/link.txt --verbose=1
+/usr/lib64/ccache/cc      CMakeFiles/cmTC_0af88.dir/CheckSymbolExists.c.o  -o cmTC_0af88 
+CMakeFiles/cmTC_0af88.dir/CheckSymbolExists.c.o: In function `main':
+CheckSymbolExists.c:(.text+0x16): undefined reference to `pthread_create'
+collect2: error: ld returned 1 exit status
+gmake[1]: *** [CMakeFiles/cmTC_0af88.dir/build.make:87: cmTC_0af88] Error 1
+gmake[1]: Leaving directory '/home/szymon/Desktop/Studia 17 18/SIK/MICHAŁ/sik2/build/CMakeFiles/CMakeTmp'
+gmake: *** [Makefile:126: cmTC_0af88/fast] Error 2
+
+File /home/szymon/Desktop/Studia 17 18/SIK/MICHAŁ/sik2/build/CMakeFiles/CMakeTmp/CheckSymbolExists.c:
+/* */
+#include <pthread.h>
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef pthread_create
+  return ((int*)(&pthread_create))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}
+
+Determining if the function pthread_create exists in the pthreads failed with the following output:
+Change Dir: /home/szymon/Desktop/Studia 17 18/SIK/MICHAŁ/sik2/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/gmake" "cmTC_baf64/fast"
+/usr/bin/gmake -f CMakeFiles/cmTC_baf64.dir/build.make CMakeFiles/cmTC_baf64.dir/build
+gmake[1]: Entering directory '/home/szymon/Desktop/Studia 17 18/SIK/MICHAŁ/sik2/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_baf64.dir/CheckFunctionExists.c.o
+/usr/lib64/ccache/cc   -DCHECK_FUNCTION_EXISTS=pthread_create   -o CMakeFiles/cmTC_baf64.dir/CheckFunctionExists.c.o   -c /usr/share/cmake/Modules/CheckFunctionExists.c
+Linking C executable cmTC_baf64
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_baf64.dir/link.txt --verbose=1
+/usr/lib64/ccache/cc  -DCHECK_FUNCTION_EXISTS=pthread_create    CMakeFiles/cmTC_baf64.dir/CheckFunctionExists.c.o  -o cmTC_baf64 -lpthreads 
+/usr/bin/ld: cannot find -lpthreads
+collect2: error: ld returned 1 exit status
+gmake[1]: *** [CMakeFiles/cmTC_baf64.dir/build.make:87: cmTC_baf64] Error 1
+gmake[1]: Leaving directory '/home/szymon/Desktop/Studia 17 18/SIK/MICHAŁ/sik2/build/CMakeFiles/CMakeTmp'
+gmake: *** [Makefile:126: cmTC_baf64/fast] Error 2
+
+
