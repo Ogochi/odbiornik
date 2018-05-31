@@ -22,6 +22,7 @@ void DataFetcher::run() {
     receiver->stateMutex.lock();
     reset();
     receiver->stateMutex.unlock();
+    std::cerr << "Made reset\n";
 
     ssize_t rcv_len;
     char *buffer = (char*)malloc(1000000 * sizeof(char));
@@ -29,6 +30,7 @@ void DataFetcher::run() {
 
     while(true) {
         receiver->stateMutex.lock();
+        std::cerr << "Checking if should end or change station\n";
         switch (receiver->state) {
             case STATION_CHANGED:
                 isValidPlayback = false;
@@ -49,15 +51,19 @@ void DataFetcher::run() {
         if (hasToExit)
             break;
 
+        std::cerr << "Reading to buffer \n";
         rcv_len = read(sock, buffer, sizeof buffer);
         if (rcv_len < 0) {
             std::cerr << "Data Fetcher read nothing" << std::endl;
             continue;
         } else {
+            std::cerr << "Received Package, trying to cast " << buffer << "\n";
             auto p = reinterpret_cast<Package*>(buffer);
+            std:;cerr << "Made cast\n";
             dataMutex.lock();
             // Case when received first package
             if (!receivedFirstPackage) {
+                std::cerr << "Set first package data\n";
                 receivedFirstPackage = true;
                 BYTE0 = p->firstByteNum;
                 sessionId = p->sessionId;
@@ -77,10 +83,12 @@ void DataFetcher::run() {
                 dataBuffer[p->firstByteNum] = *p;
                 // Starting playback if buffer is filled enough
                 if (!isValidPlayback && p->firstByteNum >= BYTE0 + receiver->BSIZE * 3 / 4) {
+                    std::cerr << "Starting playback\n";
                     isValidPlayback = true;
                     thread([this]() { startPlayback(BYTE0, validPlaybackID); });
                 }
             } else if (sessionId < p->sessionId) {
+                strd::cerr << "Different sessionId\n";
                 // Reset
                 isValidPlayback = false;
                 validPlaybackID++;
