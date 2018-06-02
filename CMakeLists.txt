@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.8)
 project(sik3)
 
 find_package(Boost COMPONENTS program_options REQUIRED)
