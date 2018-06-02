@@ -33,7 +33,7 @@ class Receiver {
     friend class ReceiverBuilder;
     friend class StationsFetcher;
     friend class DataFetcher;
-    friend RetransmissionRequestSender;
+    friend class RetransmissionRequestSender;
 private:
     string DISCOVER_ADDR, prefferedStation;
     bool isPrefferedStationSet = false;

@@ -60,10 +60,10 @@ void DataFetcher::run() {
             std::cerr << "Data Fetcher read nothing" << std::endl;
             continue;
         } else {
-            std::cerr << "Received Package, trying to cast " << buffer << "\n";
+            std::cerr << "Received Package, trying to cast " << rcv_len << "\n";
             // auto p = reinterpret_cast<Package*>(buffer);
             std::cerr << "Made cast: " << p->sessionId << " " << p->firstByteNum << " " <<  p->audioData << "\n";
-            dataMutex.lock();
+            /*dataMutex.lock();
             // Case when received first package
             if (!receivedFirstPackage) {
                 std::cerr << "Set first package data\n";
@@ -110,7 +110,7 @@ void DataFetcher::run() {
                 close(sock);
                 reset();
             }
-            dataMutex.unlock();
+            dataMutex.unlock(); */
         }
     }
 
@@ -134,7 +134,7 @@ void DataFetcher::startPlayback(uint64_t nextFirstByteNum, uint64_t playbackId) 
             break;
         } else {
             cout << mapIter->second.audioData;
-            nextFirstByteNum += strlen(mapIter->second.audioData);
+            nextFirstByteNum += strlen(mapIter->second.audioData.c_str());
         }
         dataMutex.unlock();
     }

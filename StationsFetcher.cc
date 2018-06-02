@@ -40,7 +40,7 @@ void StationsFetcher::sendLookUpPeriodically(int periodInSeconds) {
         fetchId++;
 
         std::cerr << "Sending LOOKUP" << std::endl;
-        if (sendto(sock, buffer, length, 0, (struct sockaddr *) &remoteAddress, sizeof remoteAddress) != length)
+        if (write(sock, buffer, length) != length)
             std::cerr << "Did not send whole buffer!" << std::endl;
 
         bool removedCurrentStation = false;
