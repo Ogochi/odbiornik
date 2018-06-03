@@ -5,7 +5,10 @@ void Receiver::setupFetchers() {
     dataFetcher = new DataFetcher(this);
     stationsFetcher = new StationsFetcher(this);
     retransmissionRequestSender = new RetransmissionRequestSender(this);
-    stationsFetcher->run();
+    thread t = thread([this](){ stationsFetcher->run(); });
+    t.detach();
+
+    retransmissionRequestSender->run();
 }
 
 void Receiver::run() {

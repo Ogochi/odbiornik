@@ -18,20 +18,20 @@ using std::chrono::system_clock;
 using std::mutex;
 
 class Receiver;
+class DataFetcher;
 
 class RetransmissionRequestSender {
     friend Receiver;
+    friend DataFetcher;
 private:
     Receiver *receiver;
 
-    u_int64_t validRunID = 0;
-    bool isValidRun = false;
     deque<std::pair<time_point<system_clock>, string>> requestsToSend; // pair<whenToSend, packages numbers divided by comma>
     mutex stateMutex; // Guards 'isValidRun', 'validRunID' and 'requestsToSend';
 
     RetransmissionRequestSender(Receiver *rec) : receiver(rec) {}
 
-    void run(uint64_t  id);
+    void run();
 public:
     RetransmissionRequestSender() = delete;
 };

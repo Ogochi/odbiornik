@@ -12,9 +12,11 @@ using std::queue;
 using std::mutex;
 
 class Receiver;
+class RetransmissionRequestSender;
 
 class StationsFetcher {
     friend class Receiver;
+    friend class RetransmissionRequestSender;
 private:
     Receiver *receiver;
 

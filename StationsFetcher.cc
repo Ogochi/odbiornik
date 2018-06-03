@@ -39,7 +39,7 @@ void StationsFetcher::sendLookUpPeriodically(int periodInSeconds) {
     while (true) {
         fetchId++;
 
-        std::cerr << "Sending LOOKUP" << std::endl;
+//        std::cerr << "Sending LOOKUP" << std::endl;
         if (sendto(sock, buffer, length, 0, (struct sockaddr *) &remoteAddress, sizeof remoteAddress) != length)
             std::cerr << "Did not send whole buffer!" << std::endl;
 
@@ -49,7 +49,8 @@ void StationsFetcher::sendLookUpPeriodically(int periodInSeconds) {
         // We remove station if it did not respond again during last 4 periods
         if (!receiver->stations->empty()) {
             while(receiver->stations->front()->timestamp == fetchId - 4) {
-                if (receiver->state != STATION_NOT_SELECTED &&
+                std::cerr << "State: " << (receiver->state != STATION_NOT_SELECTED ? "t" : "f") << std::endl;
+                if ((receiver->state != STATION_NOT_SELECTED) &&
                     receiver->stations->front()->equals(receiver->currentStation)) {
                     removedCurrentStation = true;
                 }
@@ -59,6 +60,7 @@ void StationsFetcher::sendLookUpPeriodically(int periodInSeconds) {
         }
         // Handling current station removal
         if (removedCurrentStation) {
+            std::cerr << "Removed curren station\n";
             if (!receiver->stations->empty()) {
                 receiver->state = STATION_CHANGED;
                 receiver->currentStation = receiver->stations->back();
@@ -87,10 +89,10 @@ void StationsFetcher::listenForReplies() const {
             continue;
         }
 
-        string msg = string(buffer);
+        string msg = string(buffer, length);
         std::istringstream stm(msg);
         string s;
-        std::cerr << "Received " << buffer << std::endl;
+//        std::cerr << "Received " << msg << std::endl;
 
         // Parsing message
         if ((stm >> s) && s == "BOREWICZ_HERE") {
@@ -106,13 +108,14 @@ void StationsFetcher::listenForReplies() const {
             while(stm >> s)
                 name += s;
 
+            transmitterAddr.sin_port = htons(receiver->CTRL_PORT);
             Stations *newStation = new Stations(addr, transmitterAddr, port, name, fetchId);
-            std::cerr << "Created Station object\n";
+//            std::cerr << "Created Station object\n";
             receiver->stationsMutex.lock();
             // Removing the same station with old timestamp
             for (auto i = receiver->stations->begin(); i != receiver->stations->end(); i++) {
                 if ((*i)->equals(newStation)) {
-                    std::cerr << "Found old timestamp for that station\n";
+//                    std::cerr << "Found old timestamp for that station\n";
                     receiver->stations->erase(i);
                     break;
                 }
@@ -125,10 +128,12 @@ void StationsFetcher::listenForReplies() const {
                     receiver->stateMutex.lock();
                     // Setting station if there is no selected station
                     if (receiver->state == STATION_NOT_SELECTED) {
+                        std::cerr << "station not selected -> selecting new station\n";
                         receiver->currentStation = newStation;
                         if (receiver->isPlaybackRunning) {
                             receiver->state = STATION_CHANGED;
                         } else {
+                            std::cerr << "Starting fetching data\n";
                             receiver->state = STATION_SELECTED;
                             thread t = thread([this](){ receiver->startFetchingData(); });
                             t.detach();

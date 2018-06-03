@@ -24,10 +24,9 @@ public:
     }
 };
 
-struct __attribute__((__packed__)) Package {
+struct Package {
     uint64_t sessionId;
     uint64_t firstByteNum;
-    // char *audioData;
     string audioData;
 };
 

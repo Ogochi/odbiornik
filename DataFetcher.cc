@@ -7,8 +7,12 @@ using std::cout;
 using std::thread;
 
 void DataFetcher::reset() {
-    // mozna sprawdzic czy cokolwiek sie zmienilo zamiast na pale robic nowy socket
-    setupSocket(receiver->currentStation->MCAST_ADDR, receiver->currentStation->DATA_PORT);
+//    std::cerr << "Made reset\n";
+    // We change socket only if mcast or dataport changed
+    if (receiver->currentStation->MCAST_ADDR != sockMCAST || receiver->currentStation->DATA_PORT != sockDATAPORT) {
+        setupSocket(receiver->currentStation->MCAST_ADDR, receiver->currentStation->DATA_PORT);
+    }
+
     receiver->isPlaybackRunning = true;
 
     dataMutex.lock();
@@ -18,11 +22,10 @@ void DataFetcher::reset() {
 }
 
 void DataFetcher::run() {
-    std::cerr << "Started fetching data\n";
+//    std::cerr << "Started fetching data\n";
     receiver->stateMutex.lock();
     reset();
     receiver->stateMutex.unlock();
-    std::cerr << "Made reset\n";
 
     ssize_t rcv_len;
     char *buffer = (char*)malloc(1000000 * sizeof(char));
@@ -30,12 +33,13 @@ void DataFetcher::run() {
 
     while(true) {
         receiver->stateMutex.lock();
-        std::cerr << "Checking if should end or change station\n";
+//        std::cerr << "Checking if should end or change station\n";
         switch (receiver->state) {
             case STATION_CHANGED:
+//                std::cerr << "Station changed!\n";
                 isValidPlayback = false;
                 validPlaybackID++;
-                close(sock);
+                receiver->state = STATION_SELECTED;
                 reset();
                 break;
             case STATION_NOT_SELECTED:
@@ -51,31 +55,27 @@ void DataFetcher::run() {
         if (hasToExit)
             break;
 
-        std::cerr << "Reading to buffer \n";
-        rcv_len = read(sock, buffer, sizeof(buffer));
+//        std::cerr << "Reading to buffer \n";
+        rcv_len = read(sock, buffer, 1000000);
+//        std::cerr << "Received " << rcv_len << " bytes!\n";
         string msg = string(buffer, rcv_len);
         Package p;
-        
-        std::cerr << "Parsing package \n";
-        string s = msg.substr(0, 8);
-        reverse(s.begin(), s.end());
-        p.sessionId = std::stoull(s);
-        string s = msg.substr(8, 8);
-        reverse(s.begin(), s.end());
-        p.firstByteNum = std::stoull(s);
-        p.audioData = msg.substr(16, rcv_len - 16);
-//         std::cerr << "Received: " << buffer << "\n";
+
         if (rcv_len < 0) {
             std::cerr << "Data Fetcher read nothing" << std::endl;
             continue;
         } else {
-            std::cerr << "Received Package, trying to cast " << rcv_len << "\n";
-            // auto p = reinterpret_cast<Package*>(buffer);
-            std::cerr << "Made cast: " << p.sessionId << " " << p.firstByteNum << " " <<  p.audioData << "\n";
+//            std::cerr << "Received Package, trying to parse\n";
+            p.sessionId = parseStringToUINT64(msg.substr(0, 8));
+            p.firstByteNum = parseStringToUINT64(msg.substr(8, 8));
+            p.audioData = msg.substr(16, rcv_len - 16);
+//            cout << p.audioData;
+            if (p.sessionId > 2000000000)
+//                std::cerr << "Made cast: " << p.sessionId << " " << p.firstByteNum << " " << "AUDIO\n";
             dataMutex.lock();
             // Case when received first package
             if (!receivedFirstPackage) {
-                std::cerr << "Set first package data\n";
+//                std::cerr << "Set first package data\n";
                 receivedFirstPackage = true;
                 BYTE0 = p.firstByteNum;
                 sessionId = p.sessionId;
@@ -86,40 +86,73 @@ void DataFetcher::run() {
                 if (!dataBuffer.empty()) {
                     auto mapIter = dataBuffer.begin();
                     bool shouldErase = false;
-                    std::cerr << "prewhile\n";
+//                    std::cerr << "prewhile\n";
                     while (true) {
-                        std::cerr << "mapIter->first " << mapIter->first << "\n";
-                        std::cerr << "iter\n";
-                        if (mapIter != dataBuffer.end() )
-                            std::cerr << "not end\n";
+//                        std::cerr << "mapIter->first " << mapIter->first << "\n";
+//                        std::cerr << "iter\n";
+//                        if (mapIter != dataBuffer.end() )
+//                            std::cerr << "not end\n";
                         if (mapIter != dataBuffer.end() &&
-                        mapIter->first < p.firstByteNum + strlen(p.audioData) - receiver->BSIZE) {
+                        mapIter->first < p.firstByteNum + (rcv_len - 16) - receiver->BSIZE) {
                             mapIter++;
                             shouldErase = true;
                         } else 
                             break;
                     }
-                    std::cerr << "if should erase\n";
+//                    std::cerr << "if should erase\n";
                     if (shouldErase)
                         dataBuffer.erase(dataBuffer.begin(), --mapIter);
                 }
                 // Adding new package
-                dataBuffer[p.firstByteNum] = p;
+//                std::cerr << "Adds new package\n";
+                auto newElem = dataBuffer.insert({p.firstByteNum, p});
+
+                // Adding retransmission requests if added package is the one with the greatest
+                // firstByteNum and is not the first package
+                if (p.firstByteNum != dataBuffer.begin()->first && p.firstByteNum == dataBuffer.rbegin()->first) {
+                    uint64_t missingByteNum = (++dataBuffer.rbegin())->first + p.audioData.size();
+                    bool isRetransmissionNeeded = false;
+                    string missingPackages;
+
+                    while (missingByteNum < p.firstByteNum) {
+                        if (isRetransmissionNeeded) {
+                            missingPackages += "," + std::to_string(missingByteNum);
+                        } else {
+                            isRetransmissionNeeded = true;
+                            missingPackages += std::to_string(missingByteNum);
+                        }
+                        missingByteNum += p.audioData.size();
+                    }
+
+                    if (isRetransmissionNeeded) {
+                        receiver->retransmissionRequestSender->stateMutex.lock();
+                        receiver->retransmissionRequestSender->requestsToSend.push_back(
+                                {std::chrono::system_clock::now() + std::chrono::milliseconds(receiver->RTIME),
+                                 missingPackages});
+                        receiver->retransmissionRequestSender->stateMutex.unlock();
+                    }
+                }
+
                 // Starting playback if buffer is filled enough
                 if (!isValidPlayback && p.firstByteNum >= BYTE0 + receiver->BSIZE * 3 / 4) {
                     std::cerr << "Starting playback\n";
                     isValidPlayback = true;
-                    thread([this]() { startPlayback(BYTE0, validPlaybackID); });
+                    thread t = thread([this]() { startPlayback(BYTE0, validPlaybackID); });
+                    t.detach();
                 }
+                dataMutex.unlock();
             } else if (sessionId < p.sessionId) {
-                std::cerr << "Different sessionId\n";
+//                std::cerr << "Different sessionId: old-" << sessionId << " new-" << p.sessionId << "\n";
                 // Reset
                 isValidPlayback = false;
                 validPlaybackID++;
-                close(sock);
+                dataMutex.unlock();
+                receiver->stateMutex.lock();
                 reset();
+                receiver->stateMutex.unlock();
+            } else {
+                dataMutex.unlock();
             }
-            dataMutex.unlock();
         }
     }
 
@@ -129,12 +162,15 @@ void DataFetcher::run() {
 void DataFetcher::startPlayback(uint64_t nextFirstByteNum, uint64_t playbackId) {
     while (true) {
         // Check if this playback is valid
+//        std::cerr << "Check if playback valid\n";
         if (validPlaybackID != playbackId)
             break;
 
         dataMutex.lock();
+//        std::cerr << "Looking for data\n";
         auto mapIter = dataBuffer.find(nextFirstByteNum);
         if (mapIter == dataBuffer.end()) {
+            std::cerr << "Needed package is not present!\n";
             // Needed package is not present
             receiver->stateMutex.lock();
             receiver->state = STATION_CHANGED;
@@ -142,14 +178,22 @@ void DataFetcher::startPlayback(uint64_t nextFirstByteNum, uint64_t playbackId) 
             dataMutex.unlock();
             break;
         } else {
+            std::cerr << "Cout audio " << nextFirstByteNum << "\n";
             cout << mapIter->second.audioData;
-            nextFirstByteNum += strlen(mapIter->second.audioData.c_str());
+            nextFirstByteNum += mapIter->second.audioData.size();
         }
         dataMutex.unlock();
     }
 }
 
 void DataFetcher::setupSocket(string multicastDottedAddress, int dataPort) {
+    socketMutex.lock();
+    if (sock != -1)
+        close(sock);
+
+    sockMCAST = multicastDottedAddress;
+    sockDATAPORT = dataPort;
+
     sock = socket(AF_INET, SOCK_DGRAM, 0);
     if (sock < 0)
         syserr("socket");
@@ -176,5 +220,15 @@ void DataFetcher::setupSocket(string multicastDottedAddress, int dataPort) {
     tv.tv_usec = 0;
     if (setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv)) < 0)
         syserr("socketopt(RCVTIMEO)");
+    socketMutex.unlock();
+}
 
+// Parses string(bytes of unit64 in network order) to uint64
+uint64_t DataFetcher::parseStringToUINT64(string s) {
+    uint64_t result = 0;
+    for (int i = 0; i < 8; i++) {
+        result += (uint64_t)(s[i]) << 8*(8 - i - 1);
+    }
+
+    return result;
 }
