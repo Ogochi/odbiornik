@@ -24,6 +24,7 @@ void RetransmissionRequestSender::run() {
             bool isRequestEmpty = true;
 
             while (std::getline(packNums, pack, ',')) {
+//                std::cerr << "to stoll: " << pack <<std::endl;
                 int64_t num = std::stoll(pack);
 
                 receiver->dataFetcher->dataMutex.lock();
