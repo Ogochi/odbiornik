@@ -28,9 +28,11 @@ void RetransmissionRequestSender::run() {
                 int64_t num = std::stoll(pack);
 
                 receiver->dataFetcher->dataMutex.lock();
-                if (num >= receiver->dataFetcher->BYTE0 &&
-                        num > receiver->dataFetcher->dataBuffer.begin()->first &&
-                        receiver->dataFetcher->dataBuffer.find(num) == receiver->dataFetcher->dataBuffer.end()) {
+//                std::cerr << num << " vs " << receiver->dataFetcher->BYTE0 << std::endl;
+                if (num < receiver->dataFetcher->BYTE0 || num < receiver->dataFetcher->dataBuffer.begin()->first)
+                    break;
+                if (receiver->dataFetcher->dataBuffer.find(num) == receiver->dataFetcher->dataBuffer.end()) {
+//                    std::cerr << "considerable request\n";
                     receiver->dataFetcher->dataMutex.unlock();
                     if (isRequestEmpty) {
                         isRequestEmpty = false;
@@ -44,6 +46,7 @@ void RetransmissionRequestSender::run() {
             }
 
             if (!isRequestEmpty) {
+//                std::cerr << "request not empty, sending\n";
                 stateMutex.lock();
                 requestsToSend.push_back(
                         {std::chrono::system_clock::now() + std::chrono::milliseconds(receiver->RTIME),
@@ -52,7 +55,7 @@ void RetransmissionRequestSender::run() {
 
                 requestString = "LOUDER_PLEASE " + requestString;
                 receiver->dataFetcher->socketMutex.lock();
-                std::cerr << "Sent retransmission request!\n";
+//                std::cerr << "Sent retransmission request!\n";
                 sendto(receiver->stationsFetcher->sock, requestString.c_str(), requestString.size(), 0,
                        (struct sockaddr *) &receiver->currentStation->transmitterAddr,
                                sizeof receiver->currentStation->transmitterAddr);

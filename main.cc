@@ -15,7 +15,7 @@ int main(int argc, char **argv) {
             (",d", po::value<string>(), "DISCOVER_ADDR")
             (",C", po::value<int>(), "CTRL_PORT")
             (",U", po::value<int>(), "UI_PORT")
-            (",B", po::value<int>(), "BSIZE")
+            (",b", po::value<int>(), "BSIZE")
             (",R", po::value<int>(), "RTIME")
             (",n", po::value<string>(), "Name of preffered station");
 
@@ -39,8 +39,8 @@ int main(int argc, char **argv) {
     if (vm.count("-U")) {
         receiverBuilder->setUI_PORT(vm["-U"].as<int>());
     }
-    if (vm.count("-B")) {
-        receiverBuilder->setBSIZE(vm["-B"].as<int>());
+    if (vm.count("-b")) {
+        receiverBuilder->setBSIZE(vm["-b"].as<int>());
     }
     if (vm.count("-R")) {
         receiverBuilder->setRTIME(vm["-R"].as<int>());

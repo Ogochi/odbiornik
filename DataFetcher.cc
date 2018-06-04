@@ -15,6 +15,10 @@ void DataFetcher::reset() {
 
     receiver->isPlaybackRunning = true;
 
+    receiver->retransmissionRequestSender->stateMutex.lock();
+    receiver->retransmissionRequestSender->requestsToSend.clear();
+    receiver->retransmissionRequestSender->stateMutex.unlock();
+
     dataMutex.lock();
     dataBuffer.clear();
     receivedFirstPackage = false;
@@ -75,7 +79,7 @@ void DataFetcher::run() {
             dataMutex.lock();
             // Case when received first package
             if (!receivedFirstPackage) {
-//                std::cerr << "Set first package data\n";
+                std::cerr << "Set first package data byte0= " << p.firstByteNum << "\n";
                 receivedFirstPackage = true;
                 BYTE0 = p.firstByteNum;
                 sessionId = p.sessionId;
@@ -109,8 +113,9 @@ void DataFetcher::run() {
 
                 // Adding retransmission requests if added package is the one with the greatest
                 // firstByteNum and is not the first package
-                if (p.firstByteNum != dataBuffer.begin()->first && p.firstByteNum == dataBuffer.rbegin()->first) {
+                if (p.firstByteNum != BYTE0 && p.firstByteNum == dataBuffer.rbegin()->first) {
                     uint64_t missingByteNum = (++dataBuffer.rbegin())->first + p.audioData.size();
+
                     bool isRetransmissionNeeded = false;
                     string missingPackages;
 
@@ -125,6 +130,7 @@ void DataFetcher::run() {
                     }
 
                     if (isRetransmissionNeeded) {
+                        std::cerr << "Adding missing packs from " << (++dataBuffer.rbegin())->first + p.audioData.size() << " to " << p.firstByteNum << std::endl;
                         receiver->retransmissionRequestSender->stateMutex.lock();
                         receiver->retransmissionRequestSender->requestsToSend.push_back(
                                 {std::chrono::system_clock::now() + std::chrono::milliseconds(receiver->RTIME),
@@ -170,7 +176,7 @@ void DataFetcher::startPlayback(uint64_t nextFirstByteNum, uint64_t playbackId) 
 //        std::cerr << "Looking for data\n";
         auto mapIter = dataBuffer.find(nextFirstByteNum);
         if (mapIter == dataBuffer.end()) {
-            std::cerr << "Needed package is not present!\n";
+            std::cerr << "Needed package is not present - " << nextFirstByteNum << "\n";
             // Needed package is not present
             receiver->stateMutex.lock();
             receiver->state = STATION_CHANGED;
