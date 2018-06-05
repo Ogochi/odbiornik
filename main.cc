@@ -13,8 +13,8 @@ int main(int argc, char **argv) {
     po::options_description desc("Options");
     desc.add_options()
             (",d", po::value<string>(), "DISCOVER_ADDR")
-            (",C", po::value<int>(), "CTRL_PORT")
-            (",U", po::value<int>(), "UI_PORT")
+            (",C", po::value<uint16_t >(), "CTRL_PORT")
+            (",U", po::value<uint16_t>(), "UI_PORT")
             (",b", po::value<int>(), "BSIZE")
             (",R", po::value<int>(), "RTIME")
             (",n", po::value<string>(), "Name of preffered station");

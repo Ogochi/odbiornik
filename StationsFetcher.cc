@@ -33,7 +33,7 @@ void StationsFetcher::setUpSocket() {
 }
 
 void StationsFetcher::sendLookUpPeriodically(int periodInSeconds) {
-    const char *buffer = "ZERO_SEVEN_COME_IN";
+    const char *buffer = "ZERO_SEVEN_COME_IN\n";
     size_t length = strlen(buffer);
 
     while (true) {
