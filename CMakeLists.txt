@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.8)
-project(sik3)
+project(odbiornik)
 
 find_package(Boost COMPONENTS program_options REQUIRED)
 find_package(Threads REQUIRED)
@@ -23,8 +23,8 @@ macro (add_executable _name)
     endif()
 endmacro()
 
-add_executable(sik3 main.cc Receiver.cc Receiver.h ReceiverBuilder.h ReceiverBuilder.cc Structures.h StationsFetcher.cc StationsFetcher.h err.cc err.h DataFetcher.cc DataFetcher.h RetransmissionRequestSender.cc RetransmissionRequestSender.h)
+add_executable(odbiornik main.cc Receiver.cc Receiver.h ReceiverBuilder.h ReceiverBuilder.cc Structures.h StationsFetcher.cc StationsFetcher.h err.cc err.h DataFetcher.cc DataFetcher.h RetransmissionRequestSender.cc RetransmissionRequestSender.h)
 
-target_link_libraries(sik3 ${Boost_LIBRARIES})
+target_link_libraries(odbiornik ${Boost_LIBRARIES})
 
 install(TARGETS DESTINATION .)
