@@ -39,6 +39,8 @@ void DataFetcher::run() {
         receiver->stateMutex.lock();
 //        std::cerr << "Checking if should end or change station\n";
         switch (receiver->state) {
+            case STATION_SELECTED:
+                break;
             case STATION_CHANGED:
 //                std::cerr << "Station changed!\n";
                 isValidPlayback = false;
@@ -91,8 +93,8 @@ void DataFetcher::run() {
 //                for (auto j : dataBuffer)
 //                    std::cerr << j.first << " ";
                 if (!dataBuffer.empty()) {
-                    if (/*p.audioData.size() + dataBuffer.rbegin()->first - dataBuffer.begin()->first > 750000*/ !isValidPlayback)
-                        std::cerr << "Buff (begin) size is: " << p.audioData.size() + dataBuffer.rbegin()->first - dataBuffer.begin()->first << "\n";
+//                    if (/*p.audioData.size() + dataBuffer.rbegin()->first - dataBuffer.begin()->first > 750000*/ !isValidPlayback)
+//                        std::cerr << "Buff (begin) size is: " << p.audioData.size() + dataBuffer.rbegin()->first - dataBuffer.begin()->first << "\n";
 //                    if (p.audioData.size() + dataBuffer.rbegin()->first - dataBuffer.begin()->first == 512) {
 //                        std::cerr << dataBuffer.begin()->first << " vs " << (int64_t)p.firstByteNum + (rcv_len - 16) - receiver->BSIZE << std::endl;
 //                    }
@@ -106,8 +108,8 @@ void DataFetcher::run() {
                     }
 
                     if (shouldErase) {
-                        std::cerr << "Buff (begin) size is: " << p.audioData.size() + dataBuffer.rbegin()->first - dataBuffer.begin()->first << "\n";
-                        std::cerr << "Removing too old pack from " << dataBuffer.begin()->first << " to " << mapIter->first << "\n";
+//                        std::cerr << "Buff (begin) size is: " << p.audioData.size() + dataBuffer.rbegin()->first - dataBuffer.begin()->first << "\n";
+//                        std::cerr << "Removing too old pack from " << dataBuffer.begin()->first << " to " << mapIter->first << "\n";
                         dataBuffer.erase(dataBuffer.begin(), mapIter);
 //                        std:: cerr << "Now begin is: " << dataBuffer.begin()->first << "\n";
 //                        auto x = dataBuffer.end();
@@ -116,7 +118,7 @@ void DataFetcher::run() {
                 }
                 // Adding new package
 //                std::cerr << "Adds new package\n";
-                auto newElem = dataBuffer.insert({p.firstByteNum, p});
+                dataBuffer.insert({p.firstByteNum, p});
 
                 // Adding retransmission requests if added package is the one with the greatest
                 // firstByteNum and is not the first package
@@ -138,7 +140,7 @@ void DataFetcher::run() {
                     }
 
                     if (isRetransmissionNeeded) {
-                        std::cerr << "Adding missing packs from " << (++dataBuffer.rbegin())->first + p.audioData.size() << " to " << p.firstByteNum << std::endl;
+//                        std::cerr << "Adding missing packs from " << (++dataBuffer.rbegin())->first + p.audioData.size() << " to " << p.firstByteNum << std::endl;
                         receiver->retransmissionRequestSender->stateMutex.lock();
                         receiver->retransmissionRequestSender->requestsToSend.push_back(
                                 {std::chrono::system_clock::now() + std::chrono::milliseconds(receiver->RTIME),

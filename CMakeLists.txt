@@ -12,7 +12,7 @@ if(NOT Threads_FOUND)
 endif()
 
 set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -g")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O2 -Wall")
 
 # http://stackoverflow.com/questions/10555706/
 macro (add_executable _name)

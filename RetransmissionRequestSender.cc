@@ -24,16 +24,13 @@ void RetransmissionRequestSender::run() {
             bool isRequestEmpty = true;
 
             while (std::getline(packNums, pack, ',')) {
-                if (pack.size() > 8)
-                    std::cerr << "Stoll err: " << request.second << "\n";
-//                std::cerr << "to stoll: " << pack <<std::endl;
-                int64_t num = std::stoll(pack);
+                uint64_t num = (uint64_t)std::stoll(pack);
 
                 receiver->dataFetcher->dataMutex.lock();
 //                std::cerr << num << " vs " << receiver->dataFetcher->BYTE0 << std::endl;
                 if (num < receiver->dataFetcher->BYTE0 || num < receiver->dataFetcher->dataBuffer.begin()->first) {
                     receiver->dataFetcher->dataMutex.unlock();
-                    std::cerr << "Not retransmitting!\n";
+//                    std::cerr << "Not retransmitting!\n";
                     break;
                 }
                 if (receiver->dataFetcher->dataBuffer.find(num) == receiver->dataFetcher->dataBuffer.end()) {
@@ -60,7 +57,7 @@ void RetransmissionRequestSender::run() {
 
                 requestString = "LOUDER_PLEASE " + requestString + "\n";
                 receiver->dataFetcher->socketMutex.lock();
-                std::cerr << "Sent retransmission request!\n";
+//                std::cerr << "Sent retransmission request!\n";
                 sendto(receiver->dataFetcher->sock, requestString.c_str(), requestString.size(), 0,
                        (struct sockaddr *) &receiver->currentStation->transmitterAddr,
                                sizeof receiver->currentStation->transmitterAddr);

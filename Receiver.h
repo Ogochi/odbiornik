@@ -35,9 +35,10 @@ class Receiver {
     friend class DataFetcher;
     friend class RetransmissionRequestSender;
 private:
-    string DISCOVER_ADDR, prefferedStation;
-    bool isPrefferedStationSet = false;
+    string DISCOVER_ADDR;
     int CTRL_PORT, UI_PORT, BSIZE, RTIME;
+    bool isPrefferedStationSet = false;
+    string prefferedStation;
     StationsFetcher *stationsFetcher;
     DataFetcher *dataFetcher;
     RetransmissionRequestSender *retransmissionRequestSender;
