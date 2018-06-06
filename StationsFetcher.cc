@@ -46,19 +46,16 @@ void StationsFetcher::sendLookUpPeriodically(int periodInSeconds) {
         bool removedCurrentStation = false;
         receiver->stationsMutex.lock();
         receiver->stateMutex.lock();
-        std::cerr << "NINJA\n";
+
         // We remove station if it did not respond again during last 4 periods
-        if (!receiver->stations->empty()) {
-            while(receiver->stations->front()->timestamp <= fetchId - 2) {
+        while(!receiver->stations->empty() && receiver->stations->front()->timestamp <= fetchId - 2) {
 //                std::cerr << "State: " << (receiver->state != STATION_NOT_SELECTED ? "t" : "f") << std::endl;
-                if ((receiver->state != STATION_NOT_SELECTED) &&
-                    receiver->stations->front()->equals(receiver->currentStation)) {
-                    removedCurrentStation = true;
-                }
-                std::cerr << "Removing " << removedCurrentStation << " " << receiver->stations->front()->name << std::endl;
-                receiver->stations->pop_front();
-                std::cerr << "removed\n";
+            if ((receiver->state != STATION_NOT_SELECTED) &&
+                receiver->stations->front()->equals(receiver->currentStation)) {
+                removedCurrentStation = true;
             }
+            std::cerr << "Removing " << removedCurrentStation << " " << receiver->stations->front()->name << std::endl;
+            receiver->stations->pop_front();
         }
         // Handling current station removal
         if (removedCurrentStation) {
@@ -108,7 +105,7 @@ void StationsFetcher::listenForReplies() const {
             }
 
             while(stm >> s)
-                name += s;
+                name += " " + s;
 
             transmitterAddr.sin_port = htons(receiver->CTRL_PORT);
             Stations *newStation = new Stations(addr, transmitterAddr, port, name, fetchId);

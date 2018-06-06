@@ -60,7 +60,7 @@ void RetransmissionRequestSender::run() {
 
                 requestString = "LOUDER_PLEASE " + requestString + "\n";
                 receiver->dataFetcher->socketMutex.lock();
-//                std::cerr << "Sent retransmission request!\n";
+                std::cerr << "Sent retransmission request!\n";
                 sendto(receiver->dataFetcher->sock, requestString.c_str(), requestString.size(), 0,
                        (struct sockaddr *) &receiver->currentStation->transmitterAddr,
                                sizeof receiver->currentStation->transmitterAddr);
