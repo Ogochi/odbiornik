@@ -34,10 +34,10 @@ int main(int argc, char **argv) {
         receiverBuilder->setDISCOVER_ADDR(vm["-d"].as<string>());
     }
     if (vm.count("-C")) {
-        receiverBuilder->setCTRL_PORT(vm["-C"].as<int>());
+        receiverBuilder->setCTRL_PORT(vm["-C"].as<uint16_t>());
     }
     if (vm.count("-U")) {
-        receiverBuilder->setUI_PORT(vm["-U"].as<int>());
+        receiverBuilder->setUI_PORT(vm["-U"].as<uint16_t>());
     }
     if (vm.count("-b")) {
         receiverBuilder->setBSIZE(vm["-b"].as<int>());
