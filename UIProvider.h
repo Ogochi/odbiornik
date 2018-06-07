@@ -33,7 +33,13 @@ private:
     InputAutomaton clientInput[maxClients];
     mutex clientsMutex; // Guards 'clients' for changing
 
-    UIProvider(Receiver *rec) : receiver(rec) {}
+    UIProvider(Receiver *rec) : receiver(rec) {
+        for (int i = 0; i < (int)maxClients; i++) {
+            clients[i].fd = -1;
+            clients[i].events = POLLIN;
+            clients[i].revents = 0;
+        }
+    }
     ~UIProvider();
 
     void setUpSocket();

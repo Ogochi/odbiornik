@@ -54,9 +54,16 @@ void StationsFetcher::sendLookUpPeriodically(int periodInSeconds) {
                 receiver->stations->front()->equals(receiver->currentStation)) {
                 removedCurrentStation = true;
             }
+
             std::cerr << "Removing " << removedCurrentStation << " " << receiver->stations->front()->name << std::endl;
+//            delete *receiver->stations->begin();
             receiver->stations->pop_front();
+
+            receiver->stateMutex.unlock();
+            receiver->stationsMutex.unlock();
             receiver->uiProvider->sendEveryoneNewMenu();
+            receiver->stationsMutex.lock();
+            receiver->stateMutex.lock();
         }
         // Handling current station removal
         if (removedCurrentStation) {
@@ -118,16 +125,26 @@ void StationsFetcher::listenForReplies() const {
             for (auto i = receiver->stations->begin(); i != receiver->stations->end(); i++) {
                 if ((*i)->equals(newStation)) {
 //                    std::cerr << "Found old timestamp for that station\n";
+//                    delete *i;
                     receiver->stations->erase(i);
                     break;
                 }
             }
-            receiver->stations->push_back(newStation);
-            receiver->stationsMutex.unlock();
 
-            receiver->uiProvider->clientsMutex.lock();
-            receiver->uiProvider->sendEveryoneNewMenu();
-            receiver->uiProvider->clientsMutex.unlock();
+            // Inserting station in the proper place in order to preserve lexical order
+            bool hasInserted = false;
+            for (auto i = receiver->stations->begin(); i != receiver->stations->end(); i++) {
+                if ((*i)->name > newStation->name) {
+                    hasInserted = true;
+                    receiver->stations->insert(i, newStation);
+                    break;
+                }
+            }
+            if (!hasInserted) {
+                receiver->stations->push_back(newStation);
+            }
+
+            receiver->stationsMutex.unlock();
 
             if ((receiver->isPrefferedStationSet && receiver->prefferedStation == name) ||
                 !receiver->isPrefferedStationSet) {
@@ -147,6 +164,10 @@ void StationsFetcher::listenForReplies() const {
                     }
                     receiver->stateMutex.unlock();
             }
+
+            receiver->uiProvider->clientsMutex.lock();
+            receiver->uiProvider->sendEveryoneNewMenu();
+            receiver->uiProvider->clientsMutex.unlock();
         }
     }
 }

@@ -2,13 +2,6 @@
 
 
 void UIProvider::setUpSocket() {
-    for (int i = 0; i < (int)maxClients; i++) {
-        clients[i].fd = -1;
-        clients[i].events = POLLIN;
-        clients[i].revents = 0;
-    }
-
-
     clients[0].fd = socket(PF_INET, SOCK_STREAM, 0);
     if (clients[0].fd < 0) {
         perror("Opening stream socket");
@@ -32,7 +25,6 @@ void UIProvider::setUpSocket() {
 }
 
 void UIProvider::run() {
-    std::cerr << "UI running!\n";
     setUpSocket();
 
     char buffer[1];
@@ -56,7 +48,6 @@ void UIProvider::run() {
             perror("poll");
         else if (ret >= 0) {
             if (clients[0].revents & POLLIN) {
-                std::cerr << "POLLIN\n";
                 int msgSock = accept(clients[0].fd, (struct sockaddr*)0, (socklen_t*)0);
 
                 if (msgSock == -1)
@@ -64,7 +55,6 @@ void UIProvider::run() {
                 else {
                     for (int i = 1; i < (int)maxClients; ++i) {
                         if (clients[i].fd == -1) {
-                            std::cerr << "Adding client\n";
                             clientsMutex.lock();
                             clients[i].fd = msgSock;
                             clientsMutex.unlock();
@@ -83,7 +73,6 @@ void UIProvider::run() {
                 if (clients[i].fd != -1 && (clients[i].revents & POLLIN)) {
                     ssize_t rval = read(clients[i].fd, buffer, 1);
                     if (rval <= 0) {
-                        std::cerr << "Ending connection" << std::endl;
                         if (close(clients[i].fd) < 0)
                             perror("close");
                         clientsMutex.lock();
@@ -91,7 +80,6 @@ void UIProvider::run() {
                         clientsMutex.unlock();
                         activeClients--;
                     } else {
-                        std::cerr << "Read sth\n";
                         clientInput[i].putInput(buffer[0]);
 
                         if (clientInput[i].isArrowUp()) {
@@ -109,7 +97,6 @@ void UIProvider::run() {
 }
 
 void UIProvider::changeStation(int move) {
-    std::cerr << "Telent changing station" << std::endl;
     receiver->stateMutex.lock();
     receiver->stationsMutex.lock();
     for (auto stationsIter = receiver->stations->begin(); stationsIter != receiver->stations->end(); stationsIter++) {
@@ -171,7 +158,7 @@ bool UIProvider::sendMenu(int socket) {
     receiver->stationsMutex.lock();
     for (auto station : *(receiver->stations)) {
         string menuLine = "  ";
-        if (station->equals(receiver->currentStation))
+        if (receiver->state != STATION_NOT_SELECTED && station->equals(receiver->currentStation))
             menuLine += "> ";
         else
             menuLine += "  ";
@@ -190,10 +177,8 @@ bool UIProvider::sendMenu(int socket) {
 }
 
 void UIProvider::sendEveryoneNewMenu() {
-    std::cerr << "Sending new menu everyone\n";
     for (int i = 1; i < (int)maxClients; ++i) {
         if (clients[i].fd != -1) {
-            std::cerr << "A\n";
             clearClientTerminal(clients[i].fd);
             sendMenu(clients[i].fd);
         }
@@ -201,7 +186,11 @@ void UIProvider::sendEveryoneNewMenu() {
 }
 
 UIProvider::~UIProvider() {
-    close(clients[0].fd);
+    for (int i = 1; i < (int)maxClients; ++i) {
+        if (clients[i].fd != -1) {
+            close(clients[i].fd);
+        }
+    }
 }
 
 void InputAutomaton::putInput(char in) {
@@ -228,5 +217,4 @@ void InputAutomaton::putInput(char in) {
                 state = 0;
             break;
     }
-    std::cerr << "Curr state: " << state << std::endl;
 }

@@ -7,10 +7,10 @@ void Receiver::setupComponents() {
     retransmissionRequestSender = new RetransmissionRequestSender(this);
     uiProvider = new UIProvider(this);
 
-    thread t = thread([this](){ stationsFetcher->run(); });
+    thread t = thread([this](){ uiProvider->run(); });
     t.detach();
 
-    t = thread([this](){ uiProvider->run(); });
+    t = thread([this](){ stationsFetcher->run(); });
     t.detach();
 
     retransmissionRequestSender->run();
