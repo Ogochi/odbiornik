@@ -2,7 +2,11 @@
 #define ODBIORNIK_UIPROVIDER_H
 
 
+#include <poll.h>
+#include <vector>
 #include "Receiver.h"
+
+using std::vector;
 
 class Receiver;
 
@@ -11,7 +15,8 @@ class UIProvider {
 private:
     Receiver *receiver;
 
-    int sock = -1;
+    static const uint64_t maxClients = _POSIX_OPEN_MAX - 7;
+    pollfd clients[maxClients];
 
     UIProvider(Receiver *rec) : receiver(rec) {}
     ~UIProvider();

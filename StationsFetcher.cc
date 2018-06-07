@@ -39,7 +39,7 @@ void StationsFetcher::sendLookUpPeriodically(int periodInSeconds) {
     while (true) {
         fetchId++;
 
-//        std::cerr << "Sending LOOKUP" << std::endl;
+        std::cerr << "Sending LOOKUP" << std::endl;
         if (sendto(sock, buffer, length, 0, (struct sockaddr *) &remoteAddress, sizeof remoteAddress) != (int64_t)length)
             std::cerr << "Did not send whole buffer!" << std::endl;
 
@@ -95,6 +95,8 @@ void StationsFetcher::listenForReplies() const {
 
         // Parsing message
         if ((stm >> s) && s == "BOREWICZ_HERE") {
+            std::cerr << "Receiverd borewicz!\n";
+
             string addr, name;
             stm >> addr >> s >> name;
             int port;

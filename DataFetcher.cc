@@ -80,6 +80,8 @@ void DataFetcher::run() {
 //            if (p.sessionId > 2000000000)
 //                std::cerr << "Made cast: " << p.sessionId << " " << p.firstByteNum << " " << "AUDIO\n";
             dataMutex.lock();
+            if (isValidPlayback)
+                std::cerr << "Got dataMutex!!!" << std::endl;
             // Case when received first package
             if (!receivedFirstPackage) {
                 std::cerr << "Set first package data byte0= " << p.firstByteNum << "\n";
@@ -185,6 +187,7 @@ void DataFetcher::startPlayback(uint64_t nextFirstByteNum, uint64_t playbackId) 
             break;
 
         dataMutex.lock();
+        std::cerr << "Playback got dataMutex :(" << std::endl;
 //        std::cerr << "Looking for data\n";
         auto mapIter = dataBuffer.find(nextFirstByteNum);
         if (mapIter == dataBuffer.end()) {

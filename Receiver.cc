@@ -10,15 +10,15 @@ void Receiver::setupComponents() {
     thread t = thread([this](){ stationsFetcher->run(); });
     t.detach();
 
-    t = thread([this](){ uiProvider->run(); });
-    t.detach();
+//    t = thread([this](){ uiProvider->run(); });
+//    t.detach();
 
     retransmissionRequestSender->run();
 }
 
 void Receiver::run() {
     // DEBUG
-    std::cout << DISCOVER_ADDR << " " << CTRL_PORT << " " << UI_PORT << " " << BSIZE << " " << RTIME << "\n";
+    std::cerr << DISCOVER_ADDR << " " << CTRL_PORT << " " << UI_PORT << " " << BSIZE << " " << RTIME << "\n";
     if (isPrefferedStationSet)
         std::cout << " " << prefferedStation << "\n";
 
