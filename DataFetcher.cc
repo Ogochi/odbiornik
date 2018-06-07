@@ -62,7 +62,7 @@ void DataFetcher::run() {
 
         if (rcv_len <= 0) {
             continue;
-        } else if (rcv_len > 16) {
+        } else if (rcv_len >= 16) {
 
             string msg = string(buffer, rcv_len);
             Package p;
@@ -147,6 +147,7 @@ void DataFetcher::run() {
                 reset();
                 receiver->stateMutex.unlock();
             } else {
+                // Ignoring package with lesser sessionId
                 dataMutex.unlock();
             }
         }
