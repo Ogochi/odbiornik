@@ -186,7 +186,7 @@ void DataFetcher::startPlayback(uint64_t nextFirstByteNum, uint64_t playbackId) 
         if (validPlaybackID != playbackId)
             break;
 
-        dataMutex.lock();
+//        dataMutex.lock();
 //        std::cerr << "Playback got dataMutex :(" << std::endl;
 //        std::cerr << "Looking for data\n";
         auto mapIter = dataBuffer.find(nextFirstByteNum);
@@ -205,7 +205,7 @@ void DataFetcher::startPlayback(uint64_t nextFirstByteNum, uint64_t playbackId) 
             cout << mapIter->second.audioData;
             nextFirstByteNum += mapIter->second.audioData.size();
         }
-        dataMutex.unlock();
+//        dataMutex.unlock();
     }
 }
 
