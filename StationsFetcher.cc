@@ -48,7 +48,7 @@ void StationsFetcher::sendLookUpPeriodically(int periodInSeconds) {
         receiver->stateMutex.lock();
 
         // We remove station if it did not respond again during last 4 periods
-        while(!receiver->stations->empty() && receiver->stations->front()->timestamp <= fetchId - 2) {
+        while(!receiver->stations->empty() && receiver->stations->front()->timestamp <= fetchId - 4) {
 //                std::cerr << "State: " << (receiver->state != STATION_NOT_SELECTED ? "t" : "f") << std::endl;
             if ((receiver->state != STATION_NOT_SELECTED) &&
                 receiver->stations->front()->equals(receiver->currentStation)) {
