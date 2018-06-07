@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.8)
-project(odbiornik)
+project(sikradio-receiver)
 
 find_package(Boost COMPONENTS program_options REQUIRED)
 find_package(Threads REQUIRED)
@@ -23,8 +23,8 @@ macro (add_executable _name)
     endif()
 endmacro()
 
-add_executable(odbiornik main.cc Receiver.cc Receiver.h ReceiverBuilder.h ReceiverBuilder.cc Structures.h StationsFetcher.cc StationsFetcher.h err.cc err.h DataFetcher.cc DataFetcher.h RetransmissionRequestSender.cc RetransmissionRequestSender.h UIProvider.cc UIProvider.h)
+add_executable(sikradio-receiver main.cc Receiver.cc Receiver.h ReceiverBuilder.h ReceiverBuilder.cc Structures.h StationsFetcher.cc StationsFetcher.h err.cc err.h DataFetcher.cc DataFetcher.h RetransmissionRequestSender.cc RetransmissionRequestSender.h UIProvider.cc UIProvider.h)
 
-target_link_libraries(odbiornik ${Boost_LIBRARIES})
+target_link_libraries(sikradio-receiver ${Boost_LIBRARIES})
 
 install(TARGETS DESTINATION .)
