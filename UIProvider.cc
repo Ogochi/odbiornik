@@ -99,9 +99,17 @@ void UIProvider::run() {
 void UIProvider::changeStation(int move) {
     receiver->stateMutex.lock();
     receiver->stationsMutex.lock();
+
+    // Check if it is possible to change station
+    if (receiver->stations->size() <= 1 || receiver->state == STATION_NOT_SELECTED) {
+        receiver->stationsMutex.unlock();
+        receiver->stateMutex.unlock();
+        return;
+    }
+
     for (auto stationsIter = receiver->stations->begin(); stationsIter != receiver->stations->end(); stationsIter++) {
         if ((*stationsIter)->equals(receiver->currentStation)) {
-            // Two corner cases and two general
+            // Two corner cases and two when station is not on the edge of the list
             if ((*stationsIter)->equals(*receiver->stations->begin()) && move == -1)
                 receiver->currentStation = *receiver->stations->rbegin();
             else if ((*stationsIter)->equals(*receiver->stations->rbegin()) && move == 1)
@@ -136,7 +144,7 @@ bool UIProvider::sendTelnetConfig(int socket) {
 }
 
 bool UIProvider::clearClientTerminal(int socket) {
-    // codes for terminal clear and cursor move to (0, 0)
+    // Codes for terminal clear and cursor move to (0, 0)
     char clear[32] = "\033[2J\033[0;0H";
     return write(socket, clear, 32) == 32;
 }
@@ -194,6 +202,7 @@ UIProvider::~UIProvider() {
 }
 
 void InputAutomaton::putInput(char in) {
+    // Automaton for checking if arrowUp or arrowDown pressed
     switch ((int)in) {
         case (int)'\033':
             state = 1;

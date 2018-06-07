@@ -17,8 +17,6 @@ void Receiver::setupComponents() {
 }
 
 void Receiver::run() {
-    // DEBUG
-    std::cerr << DISCOVER_ADDR << " " << CTRL_PORT << " " << UI_PORT << " " << BSIZE << " " << RTIME << "\n";
     if (isPrefferedStationSet)
         std::cout << " " << prefferedStation << "\n";
 

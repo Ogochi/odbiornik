@@ -53,9 +53,9 @@ void StationsFetcher::sendLookUpPeriodically(int periodInSeconds) {
                 removedCurrentStation = true;
             }
 
-//            delete *receiver->stations->begin();
             receiver->stations->pop_front();
 
+            // Update telnet menu
             receiver->stateMutex.unlock();
             receiver->stationsMutex.unlock();
             receiver->uiProvider->sendEveryoneNewMenu();
@@ -117,7 +117,6 @@ void StationsFetcher::listenForReplies() const {
             // Removing the same station with old timestamp
             for (auto i = receiver->stations->begin(); i != receiver->stations->end(); i++) {
                 if ((*i)->equals(newStation)) {
-//                    delete *i;
                     receiver->stations->erase(i);
                     break;
                 }
@@ -138,6 +137,7 @@ void StationsFetcher::listenForReplies() const {
 
             receiver->stationsMutex.unlock();
 
+            // Trying to set playback station
             if ((receiver->isPrefferedStationSet && receiver->prefferedStation == name) ||
                 !receiver->isPrefferedStationSet) {
                     receiver->stateMutex.lock();
@@ -157,6 +157,7 @@ void StationsFetcher::listenForReplies() const {
                     receiver->stateMutex.unlock();
             }
 
+            // Updating telnet menu
             receiver->uiProvider->clientsMutex.lock();
             receiver->uiProvider->sendEveryoneNewMenu();
             receiver->uiProvider->clientsMutex.unlock();

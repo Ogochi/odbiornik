@@ -67,6 +67,7 @@ void DataFetcher::run() {
             string msg = string(buffer, rcv_len);
             Package p;
 
+            // Parsing package
             p.sessionId = parseStringToUINT64(msg.substr(0, 8));
             p.firstByteNum = parseStringToUINT64(msg.substr(8, 8));
             p.audioData = msg.substr(16, rcv_len - 16);
@@ -171,6 +172,7 @@ void DataFetcher::startPlayback(uint64_t nextFirstByteNum, uint64_t playbackId) 
             receiver->stateMutex.unlock();
             break;
         } else {
+            // Putting audio to STDOUT
             cout << mapIter->second.audioData;
             nextFirstByteNum += mapIter->second.audioData.size();
         }

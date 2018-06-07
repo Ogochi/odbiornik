@@ -15,6 +15,7 @@ void RetransmissionRequestSender::run() {
             requestsToSend.pop_front();
             stateMutex.unlock();
 
+            // Waiting for the proper time to send next retransmission
             std::this_thread::sleep_for(std::chrono::duration_cast<std::chrono::milliseconds>(
                     request.first - system_clock::now()));
             std::istringstream packNums(request.second);
@@ -22,6 +23,7 @@ void RetransmissionRequestSender::run() {
             string requestString;
             bool isRequestEmpty = true;
 
+            // Checking which packs from retransmission queue are redundant
             while (std::getline(packNums, pack, ',')) {
                 uint64_t num = (uint64_t)std::stoll(pack);
 
@@ -43,6 +45,7 @@ void RetransmissionRequestSender::run() {
                 }
             }
 
+            // If request is not empty sending retransmission request
             if (!isRequestEmpty) {
                 stateMutex.lock();
                 requestsToSend.push_back(
