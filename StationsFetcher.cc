@@ -56,6 +56,7 @@ void StationsFetcher::sendLookUpPeriodically(int periodInSeconds) {
             }
             std::cerr << "Removing " << removedCurrentStation << " " << receiver->stations->front()->name << std::endl;
             receiver->stations->pop_front();
+            receiver->uiProvider->sendEveryoneNewMenu();
         }
         // Handling current station removal
         if (removedCurrentStation) {
@@ -123,6 +124,10 @@ void StationsFetcher::listenForReplies() const {
             }
             receiver->stations->push_back(newStation);
             receiver->stationsMutex.unlock();
+
+            receiver->uiProvider->clientsMutex.lock();
+            receiver->uiProvider->sendEveryoneNewMenu();
+            receiver->uiProvider->clientsMutex.unlock();
 
             if ((receiver->isPrefferedStationSet && receiver->prefferedStation == name) ||
                 !receiver->isPrefferedStationSet) {
