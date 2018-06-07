@@ -91,33 +91,6 @@ void DataFetcher::run() {
             }
 
             if (sessionId == p.sessionId) {
-                // Removing too old packages
-//                for (auto j : dataBuffer)
-//                    std::cerr << j.first << " ";
-                if (!dataBuffer.empty()) {
-//                    if (/*p.audioData.size() + dataBuffer.rbegin()->first - dataBuffer.begin()->first > 750000*/ !isValidPlayback)
-//                        std::cerr << "Buff (begin) size is: " << p.audioData.size() + dataBuffer.rbegin()->first - dataBuffer.begin()->first << "\n";
-//                    if (p.audioData.size() + dataBuffer.rbegin()->first - dataBuffer.begin()->first == 512) {
-//                        std::cerr << dataBuffer.begin()->first << " vs " << (int64_t)p.firstByteNum + (rcv_len - 16) - receiver->BSIZE << std::endl;
-//                    }
-                    auto mapIter = dataBuffer.begin();
-                    bool shouldErase = false;
-
-                    while (mapIter->first != dataBuffer.end()->first &&
-                            (int64_t)mapIter->first < (int64_t)p.firstByteNum + (rcv_len - 16) - receiver->BSIZE) {
-                        mapIter++;
-                        shouldErase = true;
-                    }
-
-                    if (shouldErase) {
-//                        std::cerr << "Buff (begin) size is: " << p.audioData.size() + dataBuffer.rbegin()->first - dataBuffer.begin()->first << "\n";
-//                        std::cerr << "Removing too old pack from " << dataBuffer.begin()->first << " to " << mapIter->first << "\n";
-                        dataBuffer.erase(dataBuffer.begin(), mapIter);
-//                        std:: cerr << "Now begin is: " << dataBuffer.begin()->first << "\n";
-//                        auto x = dataBuffer.end();
-//                        std::cerr << "Buff size is: " << dataBuffer.size() << "\n";
-                    }
-                }
                 // Adding new package
 //                std::cerr << "Adds new package\n";
                 dataBuffer.insert({p.firstByteNum, p});
@@ -126,6 +99,10 @@ void DataFetcher::run() {
                 // firstByteNum and is not the first package
                 if (p.firstByteNum != dataBuffer.begin()->first && p.firstByteNum == dataBuffer.rbegin()->first) {
                     uint64_t missingByteNum = (++dataBuffer.rbegin())->first + p.audioData.size();
+
+                    // If we received too big p.firstByteNum we do not want to request retransmission of too low packs
+                    missingByteNum = std::max(missingByteNum,
+                            p.firstByteNum - (receiver->BSIZE - (receiver->BSIZE % p.audioData.size())));
 
                     bool isRetransmissionNeeded = false;
                     string missingPackages;
@@ -148,6 +125,34 @@ void DataFetcher::run() {
                                 {std::chrono::system_clock::now() + std::chrono::milliseconds(receiver->RTIME),
                                  missingPackages});
                         receiver->retransmissionRequestSender->stateMutex.unlock();
+                    }
+                }
+
+                // Removing too old packages
+//                for (auto j : dataBuffer)
+//                    std::cerr << j.first << " ";
+                if (!dataBuffer.empty()) {
+//                    if (/*p.audioData.size() + dataBuffer.rbegin()->first - dataBuffer.begin()->first > 750000*/ !isValidPlayback)
+                    std::cerr << "Buff (begin) size is: " << p.audioData.size() + dataBuffer.rbegin()->first - dataBuffer.begin()->first << "\n";
+//                    if (p.audioData.size() + dataBuffer.rbegin()->first - dataBuffer.begin()->first == 512) {
+//                        std::cerr << dataBuffer.begin()->first << " vs " << (int64_t)p.firstByteNum + (rcv_len - 16) - receiver->BSIZE << std::endl;
+//                    }
+                    auto mapIter = dataBuffer.begin();
+                    bool shouldErase = false;
+
+                    while (mapIter->first != dataBuffer.end()->first &&
+                           (int64_t)mapIter->first < (int64_t)p.firstByteNum + (rcv_len - 16) - receiver->BSIZE) {
+                        mapIter++;
+                        shouldErase = true;
+                    }
+
+                    if (shouldErase) {
+//                        std::cerr << "Buff (begin) size is: " << p.audioData.size() + dataBuffer.rbegin()->first - dataBuffer.begin()->first << "\n";
+//                        std::cerr << "Removing too old pack from " << dataBuffer.begin()->first << " to " << mapIter->first << "\n";
+                        dataBuffer.erase(dataBuffer.begin(), mapIter);
+//                        std:: cerr << "Now begin is: " << dataBuffer.begin()->first << "\n";
+//                        auto x = dataBuffer.end();
+//                        std::cerr << "Buff size is: " << dataBuffer.size() << "\n";
                     }
                 }
 
