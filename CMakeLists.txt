@@ -23,7 +23,7 @@ macro (add_executable _name)
     endif()
 endmacro()
 
-add_executable(odbiornik main.cc Receiver.cc Receiver.h ReceiverBuilder.h ReceiverBuilder.cc Structures.h StationsFetcher.cc StationsFetcher.h err.cc err.h DataFetcher.cc DataFetcher.h RetransmissionRequestSender.cc RetransmissionRequestSender.h)
+add_executable(odbiornik main.cc Receiver.cc Receiver.h ReceiverBuilder.h ReceiverBuilder.cc Structures.h StationsFetcher.cc StationsFetcher.h err.cc err.h DataFetcher.cc DataFetcher.h RetransmissionRequestSender.cc RetransmissionRequestSender.h UIProvider.cc UIProvider.h)
 
 target_link_libraries(odbiornik ${Boost_LIBRARIES})
 

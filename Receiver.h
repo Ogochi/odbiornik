@@ -7,6 +7,7 @@
 #include "StationsFetcher.h"
 #include "DataFetcher.h"
 #include "RetransmissionRequestSender.h"
+#include "UIProvider.h"
 #include <string>
 #include <iostream>
 #include <list>
@@ -22,6 +23,7 @@ class ReceiverBuilder;
 class StationsFetcher;
 class DataFetcher;
 class RetransmissionRequestSender;
+class UIProvider;
 
 enum State {
     STATION_NOT_SELECTED,
@@ -34,14 +36,17 @@ class Receiver {
     friend class StationsFetcher;
     friend class DataFetcher;
     friend class RetransmissionRequestSender;
+    friend class UIProvider;
 private:
     string DISCOVER_ADDR;
     int CTRL_PORT, UI_PORT, BSIZE, RTIME;
     bool isPrefferedStationSet = false;
     string prefferedStation;
+
     StationsFetcher *stationsFetcher;
     DataFetcher *dataFetcher;
     RetransmissionRequestSender *retransmissionRequestSender;
+    UIProvider *uiProvider;
 
     Receiver(string _DISCOVER_ADDR, int _CTRL_PORT, int _UI_PORT, int _BSIZE, int _RTIME) :
             DISCOVER_ADDR(_DISCOVER_ADDR), CTRL_PORT(_CTRL_PORT), UI_PORT(_UI_PORT), BSIZE(_BSIZE),
@@ -59,7 +64,7 @@ private:
     bool isPlaybackRunning = false;
     mutex stateMutex; // Guards 'currentStation', 'state' and 'isPlaybackRunning'
 
-    void setupFetchers();
+    void setupComponents();
     void startFetchingData();
 public:
     Receiver() = delete;
@@ -67,6 +72,5 @@ public:
 
     void run();
 };
-
 
 #endif //SIK3_RECEIVER_H
